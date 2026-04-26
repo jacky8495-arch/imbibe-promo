@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IMBIBE × 優惠核銷</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a;
+    color: #f0ead6;
+    font-family: -apple-system, "PingFang TC", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .brand { font-size: 11px; letter-spacing: 0.3em; color: #a08c5a; text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-size: 28px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 32px; }
+
+  .check-icon {
+    width: 72px; height: 72px;
+    background: #1a3a1a;
+    border: 2px solid #22c55e;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 24px;
+  }
+
+  .greeting { font-size: 14px; color: #6b6050; margin-bottom: 4px; }
+  .name-line { font-size: 22px; font-weight: 700; color: #f0ead6; margin-bottom: 28px; letter-spacing: 0.04em; }
+
+  .offer-card {
+    background: #141414;
+    border: 1px solid #2a2418;
+    border-radius: 18px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 340px;
+    margin-bottom: 24px;
+  }
+  .offer-label { font-size: 11px; letter-spacing: 0.2em; color: #a08c5a; text-transform: uppercase; margin-bottom: 10px; }
+  .offer-text { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .offer-sub { font-size: 13px; color: #6b6050; line-height: 1.6; }
+
+  .code-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid #2a2418; }
+  .code-label { font-size: 11px; letter-spacing: 0.2em; color: #6b6050; text-transform: uppercase; margin-bottom: 10px; }
+  .code {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: #a08c5a;
+    font-variant-numeric: tabular-nums;
+  }
+  .code-hint { font-size: 12px; color: #4a4438; margin-top: 8px; }
+
+  .instruction {
+    background: #141414;
+    border: 1px solid #2a2418;
+    border-radius: 12px;
+    padding: 16px 20px;
+    width: 100%;
+    max-width: 340px;
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  .inst-title { font-size: 11px; letter-spacing: 0.15em; color: #a08c5a; text-transform: uppercase; margin-bottom: 12px; }
+  .inst-step { display: flex; gap: 10px; font-size: 13px; color: #9a8e78; margin-bottom: 8px; line-height: 1.5; }
+  .inst-num {
+    min-width: 20px; height: 20px;
+    border-radius: 50%; border: 1px solid #3a3020;
+    color: #a08c5a; font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  .note { font-size: 12px; color: #3a3428; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<p class="brand">Craft Cocktail Bar</p>
+<h1>IMBIBE</h1>
+
+<div class="check-icon">✓</div>
+
+<p class="greeting">嗨，</p>
+<p class="name-line" id="name-display">朋友</p>
+
+<div class="offer-card">
+  <p class="offer-label">本次專屬優惠</p>
+  <p class="offer-text">今日消費免服務費</p>
+  <p class="offer-sub">此優惠已綁定你的 LINE 帳號<br>每 30 天限用一次</p>
+
+  <div class="code-section">
+    <p class="code-label">出示驗證碼給服務人員</p>
+    <p class="code" id="code-display">----</p>
+    <p class="code-hint">每日更新 · 截圖無效</p>
+  </div>
+</div>
+
+<div class="instruction">
+  <p class="inst-title">使用方式</p>
+  <div class="inst-step"><div class="inst-num">1</div><span>將此頁面出示給服務人員</span></div>
+  <div class="inst-step"><div class="inst-num">2</div><span>服務人員確認驗證碼後核銷</span></div>
+  <div class="inst-step"><div class="inst-num">3</div><span>結帳時免收服務費</span></div>
+</div>
+
+<p class="note">此優惠不得與其他優惠併用<br>每桌限用一次 · 優惠由內容合作提供</p>
+
+<script>
+  var params = new URLSearchParams(location.search);
+  var code = params.get('code') || '----';
+  var name = params.get('name') || '朋友';
+
+  document.getElementById('code-display').textContent = code;
+  document.getElementById('name-display').textContent = decodeURIComponent(name);
+</script>
+</body>
+</html>

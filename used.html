@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IMBIBE × 優惠已使用</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a;
+    color: #f0ead6;
+    font-family: -apple-system, "PingFang TC", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .brand { font-size: 11px; letter-spacing: 0.3em; color: #a08c5a; text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-size: 28px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 32px; }
+
+  .icon {
+    width: 72px; height: 72px;
+    background: #1a1210;
+    border: 2px solid #6b4a2a;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 24px;
+  }
+
+  .card {
+    background: #141414;
+    border: 1px solid #2a2418;
+    border-radius: 18px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 340px;
+    margin-bottom: 20px;
+  }
+  .title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .sub { font-size: 14px; color: #6b6050; line-height: 1.7; }
+
+  .days-badge {
+    display: inline-block;
+    background: #1e1a12;
+    border: 1px solid #3a3020;
+    border-radius: 24px;
+    padding: 10px 24px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #a08c5a;
+    margin: 20px 0 12px;
+  }
+  .days-label { font-size: 13px; color: #6b6050; }
+
+  .note { font-size: 12px; color: #3a3428; line-height: 1.6; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<p class="brand">Craft Cocktail Bar</p>
+<h1>IMBIBE</h1>
+
+<div class="icon">◷</div>
+
+<div class="card">
+  <p class="title">本月優惠已使用</p>
+  <p class="sub">你的 LINE 帳號在過去 30 天內<br>已兌換過此優惠</p>
+  <div class="days-badge" id="days">--</div>
+  <p class="days-label">天後可再次使用</p>
+  <p class="note">歡迎下次帶朋友來，<br>一起享受更多精彩調酒</p>
+</div>
+
+<p class="note">每 30 天限用一次 · 每個 LINE 帳號獨立計算</p>
+
+<script>
+  var params = new URLSearchParams(location.search);
+  var days = params.get('days') || '?';
+  document.getElementById('days').textContent = days;
+</script>
+</body>
+</html>
