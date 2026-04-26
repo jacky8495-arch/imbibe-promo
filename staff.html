@@ -13,23 +13,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px;
+    padding: 40px 20px 60px;
   }
-  .header {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-  .header h1 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #1a1a1a;
-    letter-spacing: 0.05em;
-  }
-  .header p {
-    font-size: 13px;
-    color: #888;
-    margin-top: 4px;
-  }
+  .header { text-align: center; margin-bottom: 28px; }
+  .header h1 { font-size: 20px; font-weight: 700; color: #1a1a1a; letter-spacing: 0.05em; }
+  .header p { font-size: 13px; color: #999; margin-top: 4px; }
+
   .card {
     background: #fff;
     border-radius: 16px;
@@ -39,19 +28,14 @@
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
     margin-bottom: 16px;
   }
-  label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 8px;
-    letter-spacing: 0.03em;
-  }
-  input[type="number"], select {
+
+  label { display: block; font-size: 12px; font-weight: 700; color: #888; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+
+  input[type="number"] {
     width: 100%;
     padding: 14px 16px;
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
     border: 2px solid #e8e8e4;
     border-radius: 10px;
     color: #1a1a1a;
@@ -59,19 +43,17 @@
     margin-bottom: 20px;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
   }
-  input[type="number"]:focus, select:focus {
-    border-color: #a08c5a;
-    background: #fff;
-  }
-  .row {
-    display: flex;
-    gap: 12px;
-  }
+  input[type="number"]:focus { border-color: #a08c5a; background: #fff; }
+
+  .row { display: flex; gap: 12px; margin-bottom: 4px; }
   .row > div { flex: 1; }
+  .row input[type="number"] { font-size: 20px; margin-bottom: 0; }
+
   .submit-btn {
     width: 100%;
-    padding: 16px;
+    padding: 17px;
     background: #1a1a1a;
     color: #fff;
     font-size: 16px;
@@ -80,21 +62,18 @@
     border-radius: 12px;
     cursor: pointer;
     letter-spacing: 0.05em;
+    margin-top: 20px;
   }
   .submit-btn:active { background: #333; }
-  .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-  .success-msg {
-    display: none;
+  .hint {
+    font-size: 12px;
+    color: #bbb;
     text-align: center;
-    padding: 20px;
-    background: #f0fdf4;
-    border-radius: 12px;
-    color: #166534;
-    font-weight: 600;
-    font-size: 15px;
-    margin-top: 8px;
+    margin-top: 10px;
+    line-height: 1.5;
   }
+
   .records-card {
     background: #fff;
     border-radius: 16px;
@@ -103,33 +82,17 @@
     max-width: 380px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
   }
-  .records-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #888;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
+  .records-title { font-size: 11px; font-weight: 700; color: #aaa; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
   .record-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #f0f0ec;
-    font-size: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid #f0f0ec; font-size: 14px;
   }
   .record-row:last-child { border-bottom: none; }
-  .record-time { color: #999; font-size: 12px; }
+  .record-meta { font-size: 12px; color: #bbb; }
   .record-amt { font-weight: 700; color: #1a1a1a; }
   .total-row {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 14px;
-    margin-top: 4px;
-    border-top: 2px solid #1a1a1a;
-    font-weight: 700;
-    font-size: 15px;
+    display: flex; justify-content: space-between; padding-top: 14px;
+    margin-top: 4px; border-top: 2px solid #1a1a1a; font-weight: 700; font-size: 15px;
   }
   #no-records { color: #ccc; font-size: 14px; text-align: center; padding: 16px 0; }
 </style>
@@ -137,33 +100,31 @@
 <body>
 
 <div class="header">
-  <h1>IMBIBE × 核銷記錄</h1>
-  <p>顧客出示優惠頁面時，填寫消費金額</p>
+  <h1>IMBIBE × 核銷</h1>
+  <p>顧客出示優惠時填寫，按下後自動開啟記錄表</p>
 </div>
 
 <div class="card">
-  <form id="record-form">
-    <label>消費金額（結帳總額）</label>
-    <input type="number" id="amount" placeholder="0" min="0" step="50" required>
+  <label>消費金額（含稅，免服務費後）</label>
+  <input type="number" id="amount" placeholder="0" min="0" step="50" inputmode="numeric">
 
-    <div class="row">
-      <div>
-        <label>桌號（選填）</label>
-        <input type="number" id="table" placeholder="—" min="1" max="50" style="font-size:18px;">
-      </div>
-      <div>
-        <label>人數（選填）</label>
-        <input type="number" id="pax" placeholder="—" min="1" max="20" style="font-size:18px;">
-      </div>
+  <div class="row">
+    <div>
+      <label>桌號</label>
+      <input type="number" id="table" placeholder="—" min="1" max="99" inputmode="numeric">
     </div>
+    <div>
+      <label>人數</label>
+      <input type="number" id="pax" placeholder="—" min="1" max="30" inputmode="numeric">
+    </div>
+  </div>
 
-    <button type="submit" class="submit-btn" id="submit-btn">✓ 核銷紀錄</button>
-  </form>
-  <div class="success-msg" id="success-msg">✓ 已記錄！</div>
+  <button class="submit-btn" onclick="submit()">✓ 核銷並記錄</button>
+  <p class="hint">按下後會開啟 Google 表單<br>確認資料後送出即完成記錄</p>
 </div>
 
 <div class="records-card">
-  <div class="records-title">今日記錄</div>
+  <div class="records-title">今日本機記錄</div>
   <div id="records-list"><div id="no-records">尚無記錄</div></div>
   <div class="total-row" id="total-row" style="display:none">
     <span>今日合計</span>
@@ -172,76 +133,55 @@
 </div>
 
 <script>
-  const SHEET_URL = 'REPLACE_WITH_APPS_SCRIPT_URL'; // 部署後填入
+  var FORM_BASE = 'https://docs.google.com/forms/d/e/1FAIpQLSca5lBQbobOKAkMYb3Mq0njsDHwbsa8uZr8nynsRt57bEk_Vg/viewform';
+  var ENTRY_AMOUNT = 'entry.1801055237';
+  var ENTRY_TABLE  = 'entry.1687691748';
 
-  const KEY = 'imbibe_records_' + new Date().toDateString();
-  let records = JSON.parse(localStorage.getItem(KEY) || '[]');
+  var KEY = 'imbibe_' + new Date().toDateString();
+  var records = JSON.parse(localStorage.getItem(KEY) || '[]');
+
+  function submit() {
+    var amount = parseInt(document.getElementById('amount').value);
+    var table  = document.getElementById('table').value || '';
+    var pax    = document.getElementById('pax').value || '';
+    if (!amount || amount <= 0) { alert('請輸入消費金額'); return; }
+
+    // 存本機
+    records.unshift({ amount: amount, table: table, pax: pax, ts: Date.now() });
+    localStorage.setItem(KEY, JSON.stringify(records));
+    renderRecords();
+
+    // 清空
+    document.getElementById('amount').value = '';
+    document.getElementById('table').value = '';
+    document.getElementById('pax').value = '';
+
+    // 開啟預填 Google Form
+    var label = table ? amount + '（桌' + table + (pax ? '・' + pax + '人' : '') + '）' : amount + '';
+    var url = FORM_BASE + '?usp=pp_url'
+            + '&' + ENTRY_AMOUNT + '=' + encodeURIComponent(amount)
+            + '&' + ENTRY_TABLE  + '=' + encodeURIComponent(table ? '桌' + table + (pax ? '・' + pax + '人' : '') : '');
+    window.open(url, '_blank');
+  }
 
   function renderRecords() {
-    const list = document.getElementById('records-list');
-    const noRec = document.getElementById('no-records');
-    const totalRow = document.getElementById('total-row');
-    const totalAmt = document.getElementById('total-amt');
-
+    var list = document.getElementById('records-list');
+    var totalRow = document.getElementById('total-row');
     if (records.length === 0) {
       list.innerHTML = '<div id="no-records">尚無記錄</div>';
       totalRow.style.display = 'none';
       return;
     }
-
-    let total = 0;
-    list.innerHTML = records.map(r => {
+    var total = 0;
+    list.innerHTML = records.map(function(r) {
       total += r.amount;
-      const time = new Date(r.ts).toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
-      const extra = [r.table ? `桌${r.table}` : '', r.pax ? `${r.pax}人` : ''].filter(Boolean).join('・');
-      return `<div class="record-row">
-        <div>
-          <div class="record-time">${time}${extra ? ' · ' + extra : ''}</div>
-        </div>
-        <div class="record-amt">$${r.amount.toLocaleString()}</div>
-      </div>`;
+      var time = new Date(r.ts).toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
+      var meta = time + (r.table ? ' · 桌' + r.table : '') + (r.pax ? ' · ' + r.pax + '人' : '');
+      return '<div class="record-row"><span class="record-meta">' + meta + '</span><span class="record-amt">$' + r.amount.toLocaleString() + '</span></div>';
     }).join('');
-
     totalRow.style.display = 'flex';
-    totalAmt.textContent = '$' + total.toLocaleString();
+    document.getElementById('total-amt').textContent = '$' + total.toLocaleString();
   }
-
-  document.getElementById('record-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const amount = parseInt(document.getElementById('amount').value);
-    const table = document.getElementById('table').value || '';
-    const pax = document.getElementById('pax').value || '';
-    if (!amount) return;
-
-    const record = { amount, table, pax, ts: Date.now() };
-    records.unshift(record);
-    localStorage.setItem(KEY, JSON.stringify(records));
-    renderRecords();
-
-    // 送出到 Google Sheets
-    if (SHEET_URL !== 'REPLACE_WITH_APPS_SCRIPT_URL') {
-      const btn = document.getElementById('submit-btn');
-      btn.disabled = true;
-      try {
-        await fetch(SHEET_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(record)
-        });
-      } catch(err) {}
-      btn.disabled = false;
-    }
-
-    // 顯示成功
-    document.getElementById('success-msg').style.display = 'block';
-    document.getElementById('amount').value = '';
-    document.getElementById('table').value = '';
-    document.getElementById('pax').value = '';
-    setTimeout(() => {
-      document.getElementById('success-msg').style.display = 'none';
-    }, 2000);
-  });
 
   renderRecords();
 </script>
