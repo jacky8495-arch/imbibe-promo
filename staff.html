@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IMBIBE 核銷記錄</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #f5f5f0;
+    font-family: -apple-system, "PingFang TC", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.05em;
+  }
+  .header p {
+    font-size: 13px;
+    color: #888;
+    margin-top: 4px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+    letter-spacing: 0.03em;
+  }
+  input[type="number"], select {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 20px;
+    font-weight: 600;
+    border: 2px solid #e8e8e4;
+    border-radius: 10px;
+    color: #1a1a1a;
+    background: #fafaf8;
+    margin-bottom: 20px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  input[type="number"]:focus, select:focus {
+    border-color: #a08c5a;
+    background: #fff;
+  }
+  .row {
+    display: flex;
+    gap: 12px;
+  }
+  .row > div { flex: 1; }
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+  .submit-btn:active { background: #333; }
+  .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+  .success-msg {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    background: #f0fdf4;
+    border-radius: 12px;
+    color: #166534;
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: 8px;
+  }
+  .records-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 24px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .records-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #888;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .record-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0ec;
+    font-size: 14px;
+  }
+  .record-row:last-child { border-bottom: none; }
+  .record-time { color: #999; font-size: 12px; }
+  .record-amt { font-weight: 700; color: #1a1a1a; }
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 14px;
+    margin-top: 4px;
+    border-top: 2px solid #1a1a1a;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  #no-records { color: #ccc; font-size: 14px; text-align: center; padding: 16px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>IMBIBE × 核銷記錄</h1>
+  <p>顧客出示優惠頁面時，填寫消費金額</p>
+</div>
+
+<div class="card">
+  <form id="record-form">
+    <label>消費金額（結帳總額）</label>
+    <input type="number" id="amount" placeholder="0" min="0" step="50" required>
+
+    <div class="row">
+      <div>
+        <label>桌號（選填）</label>
+        <input type="number" id="table" placeholder="—" min="1" max="50" style="font-size:18px;">
+      </div>
+      <div>
+        <label>人數（選填）</label>
+        <input type="number" id="pax" placeholder="—" min="1" max="20" style="font-size:18px;">
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submit-btn">✓ 核銷紀錄</button>
+  </form>
+  <div class="success-msg" id="success-msg">✓ 已記錄！</div>
+</div>
+
+<div class="records-card">
+  <div class="records-title">今日記錄</div>
+  <div id="records-list"><div id="no-records">尚無記錄</div></div>
+  <div class="total-row" id="total-row" style="display:none">
+    <span>今日合計</span>
+    <span id="total-amt">$0</span>
+  </div>
+</div>
+
+<script>
+  const SHEET_URL = 'REPLACE_WITH_APPS_SCRIPT_URL'; // 部署後填入
+
+  const KEY = 'imbibe_records_' + new Date().toDateString();
+  let records = JSON.parse(localStorage.getItem(KEY) || '[]');
+
+  function renderRecords() {
+    const list = document.getElementById('records-list');
+    const noRec = document.getElementById('no-records');
+    const totalRow = document.getElementById('total-row');
+    const totalAmt = document.getElementById('total-amt');
+
+    if (records.length === 0) {
+      list.innerHTML = '<div id="no-records">尚無記錄</div>';
+      totalRow.style.display = 'none';
+      return;
+    }
+
+    let total = 0;
+    list.innerHTML = records.map(r => {
+      total += r.amount;
+      const time = new Date(r.ts).toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
+      const extra = [r.table ? `桌${r.table}` : '', r.pax ? `${r.pax}人` : ''].filter(Boolean).join('・');
+      return `<div class="record-row">
+        <div>
+          <div class="record-time">${time}${extra ? ' · ' + extra : ''}</div>
+        </div>
+        <div class="record-amt">$${r.amount.toLocaleString()}</div>
+      </div>`;
+    }).join('');
+
+    totalRow.style.display = 'flex';
+    totalAmt.textContent = '$' + total.toLocaleString();
+  }
+
+  document.getElementById('record-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const amount = parseInt(document.getElementById('amount').value);
+    const table = document.getElementById('table').value || '';
+    const pax = document.getElementById('pax').value || '';
+    if (!amount) return;
+
+    const record = { amount, table, pax, ts: Date.now() };
+    records.unshift(record);
+    localStorage.setItem(KEY, JSON.stringify(records));
+    renderRecords();
+
+    // 送出到 Google Sheets
+    if (SHEET_URL !== 'REPLACE_WITH_APPS_SCRIPT_URL') {
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      try {
+        await fetch(SHEET_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(record)
+        });
+      } catch(err) {}
+      btn.disabled = false;
+    }
+
+    // 顯示成功
+    document.getElementById('success-msg').style.display = 'block';
+    document.getElementById('amount').value = '';
+    document.getElementById('table').value = '';
+    document.getElementById('pax').value = '';
+    setTimeout(() => {
+      document.getElementById('success-msg').style.display = 'none';
+    }, 2000);
+  });
+
+  renderRecords();
+</script>
+
+</body>
+</html>
