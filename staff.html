@@ -31,7 +31,7 @@
 
   label { display: block; font-size: 12px; font-weight: 700; color: #888; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
 
-  input[type="number"] {
+  input {
     width: 100%;
     padding: 14px 16px;
     font-size: 28px;
@@ -45,11 +45,12 @@
     -webkit-appearance: none;
     appearance: none;
   }
-  input[type="number"]:focus { border-color: #a08c5a; background: #fff; }
+  input#code { letter-spacing: 0.4em; text-align: center; }
+  input:focus { border-color: #a08c5a; background: #fff; }
 
-  .row { display: flex; gap: 12px; margin-bottom: 4px; }
+  .row { display: flex; gap: 12px; }
   .row > div { flex: 1; }
-  .row input[type="number"] { font-size: 20px; margin-bottom: 0; }
+  .row input { font-size: 20px; margin-bottom: 0; }
 
   .submit-btn {
     width: 100%;
@@ -65,14 +66,20 @@
     margin-top: 20px;
   }
   .submit-btn:active { background: #333; }
+  .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-  .hint {
-    font-size: 12px;
-    color: #bbb;
+  .feedback {
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
     text-align: center;
-    margin-top: 10px;
+    margin-top: 14px;
+    display: none;
     line-height: 1.5;
   }
+  .feedback.success { background: #f0faf0; color: #1a7a1a; border: 1px solid #b0e0b0; }
+  .feedback.error   { background: #fff0f0; color: #a00000; border: 1px solid #f0b0b0; }
 
   .records-card {
     background: #fff;
@@ -101,11 +108,14 @@
 
 <div class="header">
   <h1>IMBIBE × 核銷</h1>
-  <p>顧客出示優惠時填寫，按下後自動開啟記錄表</p>
+  <p>確認顧客驗證碼後填入金額送出</p>
 </div>
 
 <div class="card">
-  <label>消費金額（含稅，免服務費後）</label>
+  <label>顧客驗證碼</label>
+  <input type="text" id="code" placeholder="0000" maxlength="4" inputmode="numeric" autocomplete="off">
+
+  <label>消費金額（免服務費後）</label>
   <input type="number" id="amount" placeholder="0" min="0" step="50" inputmode="numeric">
 
   <div class="row">
@@ -119,8 +129,8 @@
     </div>
   </div>
 
-  <button class="submit-btn" onclick="submit()">✓ 核銷並記錄</button>
-  <p class="hint">按下後會開啟 Google 表單<br>確認資料後送出即完成記錄</p>
+  <button class="submit-btn" id="btn" onclick="submitRedeem()">✓ 核銷並記錄</button>
+  <div class="feedback" id="feedback"></div>
 </div>
 
 <div class="records-card">
@@ -133,39 +143,69 @@
 </div>
 
 <script>
-  var FORM_BASE = 'https://docs.google.com/forms/d/e/1FAIpQLSca5lBQbobOKAkMYb3Mq0njsDHwbsa8uZr8nynsRt57bEk_Vg/viewform';
-  var ENTRY_AMOUNT = 'entry.1801055237';
-  var ENTRY_TABLE  = 'entry.1687691748';
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxatg4reCNnY_5udcKdkb1HmEYYu66YQdVMuilGuOTscJax1Z01GfXUgm3Z6_QZg7QSqA/exec';
 
   var KEY = 'imbibe_' + new Date().toDateString();
   var records = JSON.parse(localStorage.getItem(KEY) || '[]');
+  renderRecords();
 
-  function submit() {
+  function submitRedeem() {
+    var code   = document.getElementById('code').value.trim();
     var amount = parseInt(document.getElementById('amount').value);
     var table  = document.getElementById('table').value || '';
-    var pax    = document.getElementById('pax').value || '';
-    if (!amount || amount <= 0) { alert('請輸入消費金額'); return; }
+    var pax    = document.getElementById('pax').value   || '';
 
-    // 存本機
-    records.unshift({ amount: amount, table: table, pax: pax, ts: Date.now() });
-    localStorage.setItem(KEY, JSON.stringify(records));
-    renderRecords();
+    if (code.length !== 4) { showFeedback('error', '請輸入顧客的 4 位驗證碼'); return; }
+    if (!amount || amount <= 0) { showFeedback('error', '請輸入消費金額'); return; }
 
-    // 清空
-    document.getElementById('amount').value = '';
-    document.getElementById('table').value = '';
-    document.getElementById('pax').value = '';
+    var btn = document.getElementById('btn');
+    btn.disabled = true;
+    btn.textContent = '驗證中…';
 
-    // 開啟預填 Google Form
-    var label = table ? amount + '（桌' + table + (pax ? '・' + pax + '人' : '') + '）' : amount + '';
-    var url = FORM_BASE + '?usp=pp_url'
-            + '&' + ENTRY_AMOUNT + '=' + encodeURIComponent(amount)
-            + '&' + ENTRY_TABLE  + '=' + encodeURIComponent(table ? '桌' + table + (pax ? '・' + pax + '人' : '') : '');
-    window.open(url, '_blank');
+    var url = SCRIPT_URL
+      + '?action=redeem'
+      + '&code='   + encodeURIComponent(code)
+      + '&amount=' + encodeURIComponent(amount)
+      + '&table='  + encodeURIComponent(table)
+      + '&pax='    + encodeURIComponent(pax);
+
+    fetch(url)
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        btn.disabled = false;
+        btn.textContent = '✓ 核銷並記錄';
+
+        if (data.status === 'ok') {
+          showFeedback('success', '核銷成功！\n' + data.name + ' · $' + parseInt(amount).toLocaleString());
+          records.unshift({ code: code, amount: amount, table: table, pax: pax, name: data.name, ts: Date.now() });
+          localStorage.setItem(KEY, JSON.stringify(records));
+          renderRecords();
+          document.getElementById('code').value   = '';
+          document.getElementById('amount').value = '';
+          document.getElementById('table').value  = '';
+          document.getElementById('pax').value    = '';
+        } else {
+          showFeedback('error', '驗證碼無效或已使用\n請確認顧客頁面上的號碼');
+        }
+      })
+      .catch(function() {
+        btn.disabled = false;
+        btn.textContent = '✓ 核銷並記錄';
+        showFeedback('error', '網路錯誤，請重試');
+      });
+  }
+
+  function showFeedback(type, msg) {
+    var el = document.getElementById('feedback');
+    el.className = 'feedback ' + type;
+    el.style.whiteSpace = 'pre-line';
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(function() { el.style.display = 'none'; }, 5000);
   }
 
   function renderRecords() {
-    var list = document.getElementById('records-list');
+    var list     = document.getElementById('records-list');
     var totalRow = document.getElementById('total-row');
     if (records.length === 0) {
       list.innerHTML = '<div id="no-records">尚無記錄</div>';
@@ -175,15 +215,16 @@
     var total = 0;
     list.innerHTML = records.map(function(r) {
       total += r.amount;
-      var time = new Date(r.ts).toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
-      var meta = time + (r.table ? ' · 桌' + r.table : '') + (r.pax ? ' · ' + r.pax + '人' : '');
+      var time = new Date(r.ts).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+      var meta = time
+        + (r.name  ? ' · ' + r.name        : '')
+        + (r.table ? ' · 桌' + r.table     : '')
+        + (r.pax   ? ' · ' + r.pax + '人'  : '');
       return '<div class="record-row"><span class="record-meta">' + meta + '</span><span class="record-amt">$' + r.amount.toLocaleString() + '</span></div>';
     }).join('');
     totalRow.style.display = 'flex';
     document.getElementById('total-amt').textContent = '$' + total.toLocaleString();
   }
-
-  renderRecords();
 </script>
 
 </body>
