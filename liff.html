@@ -40,10 +40,12 @@
   <p class="msg" id="msg">正在驗證 LINE 身份…</p>
 
 <script>
-  var LIFF_ID  = '2009912149-izRiSylm';       // LIFF ID
+  var LIFF_ID  = '2009912149-izRiSylm';
   var API_URL  = 'https://script.google.com/macros/s/AKfycbxatg4reCNnY_5udcKdkb1HmEYYu66YQdVMuilGuOTscJax1Z01GfXUgm3Z6_QZg7QSqA/exec';
 
-  var source = new URLSearchParams(location.search).get('source') || 'direct';
+  var params = new URLSearchParams(location.search);
+  var mode   = params.get('mode')   || 'verify';   // 'register' = 影片連結, 'verify' = 酒吧 QR
+  var source = params.get('source') || 'direct';
 
   liff.init({ liffId: LIFF_ID })
     .then(function() {
@@ -55,21 +57,31 @@
     })
     .then(function(profile) {
       if (!profile) return;
-      document.getElementById('msg').textContent = '取得身份成功，驗證中…';
+      document.getElementById('msg').textContent = '取得身份成功，處理中…';
       var uid  = profile.userId;
       var name = profile.displayName;
-      var url  = API_URL + '?uid=' + encodeURIComponent(uid) + '&name=' + encodeURIComponent(name) + '&source=' + encodeURIComponent(source);
-      return fetch(url);
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      if (data.status === 'ok') {
-        location.href = 'verified.html?code=' + data.code + '&name=' + encodeURIComponent(data.name);
+
+      if (mode === 'register') {
+        // 影片連結模式：登記來源，推歡迎訊息
+        var url = API_URL + '?action=register&uid=' + encodeURIComponent(uid) + '&name=' + encodeURIComponent(name) + '&source=' + encodeURIComponent(source);
+        return fetch(url).then(function(res) { return res.json(); }).then(function() {
+          location.href = 'registered.html';
+        });
       } else {
-        location.href = 'used.html?days=' + data.daysRemaining;
+        // 酒吧 QR 模式：30 天檢查，產生驗證碼
+        var url = API_URL + '?action=verify&uid=' + encodeURIComponent(uid) + '&name=' + encodeURIComponent(name);
+        return fetch(url)
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data.status === 'ok') {
+              location.href = 'verified.html?code=' + data.code + '&name=' + encodeURIComponent(data.name);
+            } else {
+              location.href = 'used.html?days=' + data.daysRemaining;
+            }
+          });
       }
     })
-    .catch(function(err) {
+    .catch(function() {
       document.getElementById('spinner').style.display = 'none';
       document.getElementById('msg').textContent = '發生錯誤，請重新掃描 QR code。';
     });

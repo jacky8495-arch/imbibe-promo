@@ -147,7 +147,7 @@
 
 <p class="brand">IMBIBE × Staff</p>
 <h1>QR 產生器</h1>
-<p class="sub">每支短影音用一個專屬 QR code</p>
+<p class="sub">產生 Bio 連結或 Stories 貼紙用的登記連結</p>
 
 <div class="card">
   <label>影片名稱（用英文或數字）</label>
@@ -181,9 +181,9 @@
   function generate() {
     var raw    = document.getElementById('sourceName').value.trim();
     var source = raw.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\-一-鿿]/g, '');
-    if (!source) { alert('請輸入影片名稱'); return; }
+    if (!source) { alert('請輸入名稱'); return; }
 
-    var targetUrl = LIFF_URL + '?source=' + encodeURIComponent(source);
+    var targetUrl = LIFF_URL + '?mode=register&source=' + encodeURIComponent(source);
     var qrUrl     = QR_API + encodeURIComponent(targetUrl);
 
     document.getElementById('result-name').textContent = source;
