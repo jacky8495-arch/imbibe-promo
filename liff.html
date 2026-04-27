@@ -43,6 +43,8 @@
   var LIFF_ID  = '2009912149-izRiSylm';       // LIFF ID
   var API_URL  = 'https://script.google.com/macros/s/AKfycbxatg4reCNnY_5udcKdkb1HmEYYu66YQdVMuilGuOTscJax1Z01GfXUgm3Z6_QZg7QSqA/exec';
 
+  var source = new URLSearchParams(location.search).get('source') || 'direct';
+
   liff.init({ liffId: LIFF_ID })
     .then(function() {
       if (!liff.isLoggedIn()) {
@@ -56,7 +58,7 @@
       document.getElementById('msg').textContent = '取得身份成功，驗證中…';
       var uid  = profile.userId;
       var name = profile.displayName;
-      var url  = API_URL + '?uid=' + encodeURIComponent(uid) + '&name=' + encodeURIComponent(name);
+      var url  = API_URL + '?uid=' + encodeURIComponent(uid) + '&name=' + encodeURIComponent(name) + '&source=' + encodeURIComponent(source);
       return fetch(url);
     })
     .then(function(res) { return res.json(); })

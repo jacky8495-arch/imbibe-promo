@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IMBIBE QR 產生器</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a;
+    color: #f0ead6;
+    font-family: -apple-system, "PingFang TC", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px 60px;
+  }
+  .brand { font-size: 11px; letter-spacing: 0.3em; color: #a08c5a; text-transform: uppercase; margin-bottom: 8px; }
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .sub { font-size: 13px; color: #6b6050; margin-bottom: 40px; }
+
+  .card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 360px;
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b6050;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 2px solid #222;
+    border-radius: 12px;
+    color: #f0ead6;
+    background: #0a0a0a;
+    outline: none;
+    margin-bottom: 8px;
+  }
+  input[type="text"]:focus { border-color: #a08c5a; }
+  input::placeholder { color: #3a3428; font-weight: 400; }
+
+  .hint { font-size: 12px; color: #3a3428; margin-bottom: 20px; line-height: 1.6; }
+  .hint span { color: #6b6050; }
+
+  .gen-btn {
+    width: 100%;
+    padding: 16px;
+    background: #a08c5a;
+    color: #0a0a0a;
+    font-size: 15px;
+    font-weight: 800;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+  }
+  .gen-btn:active { background: #8a7848; }
+
+  /* QR result */
+  .result-card {
+    background: #111;
+    border: 1px solid #2a2418;
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    display: none;
+  }
+  .result-label { font-size: 11px; color: #6b6050; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .result-name { font-size: 18px; font-weight: 700; color: #a08c5a; margin-bottom: 24px; letter-spacing: 0.04em; }
+
+  .qr-wrap {
+    background: #f0ead6;
+    border-radius: 16px;
+    padding: 16px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  .qr-wrap img { display: block; width: 200px; height: 200px; }
+
+  .url-box {
+    background: #0a0a0a;
+    border: 1px solid #2a2418;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 11px;
+    color: #6b6050;
+    word-break: break-all;
+    text-align: left;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .dl-btn {
+    display: inline-block;
+    padding: 13px 28px;
+    background: #1a1a1a;
+    color: #f0ead6;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid #333;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+  }
+  .dl-btn:active { background: #2a2a2a; }
+
+  /* History */
+  .history-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 20px;
+    padding: 20px 24px;
+    width: 100%;
+    max-width: 360px;
+  }
+  .history-title { font-size: 11px; font-weight: 700; color: #3a3428; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+  .history-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-name { color: #f0ead6; font-weight: 600; }
+  .history-use { font-size: 12px; color: #a08c5a; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  #no-history { font-size: 13px; color: #2a2418; text-align: center; padding: 8px 0; }
+</style>
+</head>
+<body>
+
+<p class="brand">IMBIBE × Staff</p>
+<h1>QR 產生器</h1>
+<p class="sub">每支短影音用一個專屬 QR code</p>
+
+<div class="card">
+  <label>影片名稱（用英文或數字）</label>
+  <input type="text" id="sourceName" placeholder="例如：reel_0428、cocktail_01" maxlength="40" autocomplete="off">
+  <p class="hint">建議格式：<span>reel_日期</span> 或 <span>影片主題_編號</span><br>這個名稱會出現在報告裡</p>
+  <button class="gen-btn" onclick="generate()">產生 QR Code</button>
+</div>
+
+<div class="result-card" id="result">
+  <p class="result-label">影片來源</p>
+  <p class="result-name" id="result-name"></p>
+  <div class="qr-wrap">
+    <img id="qr-img" src="" alt="QR Code">
+  </div>
+  <div class="url-box" id="url-box"></div>
+  <a class="dl-btn" id="dl-btn" href="#" download>下載 QR Code</a>
+</div>
+
+<div class="history-card" id="history-card" style="display:none; margin-top:16px;">
+  <p class="history-title">已產生的 QR</p>
+  <div id="history-list"></div>
+</div>
+
+<script>
+  var LIFF_URL = 'https://liff.line.me/2009912149-izRiSylm';
+  var QR_API   = 'https://api.qrserver.com/v1/create-qr-code/?size=600x600&color=1a1a1a&bgcolor=f0ead6&data=';
+
+  var history = JSON.parse(localStorage.getItem('imbibe_qr_history') || '[]');
+  renderHistory();
+
+  function generate() {
+    var raw    = document.getElementById('sourceName').value.trim();
+    var source = raw.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\-一-鿿]/g, '');
+    if (!source) { alert('請輸入影片名稱'); return; }
+
+    var targetUrl = LIFF_URL + '?source=' + encodeURIComponent(source);
+    var qrUrl     = QR_API + encodeURIComponent(targetUrl);
+
+    document.getElementById('result-name').textContent = source;
+    document.getElementById('qr-img').src = qrUrl;
+    document.getElementById('url-box').textContent = targetUrl;
+
+    // 下載按鈕（透過中轉避免跨域問題）
+    document.getElementById('dl-btn').href = qrUrl + '&format=png';
+    document.getElementById('dl-btn').download = 'qr_' + source + '.png';
+
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // 存歷史
+    if (!history.includes(source)) {
+      history.unshift(source);
+      if (history.length > 10) history.pop();
+      localStorage.setItem('imbibe_qr_history', JSON.stringify(history));
+      renderHistory();
+    }
+  }
+
+  function renderHistory() {
+    var card = document.getElementById('history-card');
+    var list = document.getElementById('history-list');
+    if (history.length === 0) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    list.innerHTML = history.map(function(s) {
+      return '<div class="history-item"><span class="history-name">' + s + '</span><span class="history-use" onclick="useHistory(\'' + s + '\')">重新產生</span></div>';
+    }).join('');
+  }
+
+  function useHistory(source) {
+    document.getElementById('sourceName').value = source;
+    generate();
+  }
+</script>
+</body>
+</html>
