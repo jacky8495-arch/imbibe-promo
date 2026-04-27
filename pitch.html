@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>短影音 × LINE 私域導流系統｜提案</title>
+<style>
+  :root {
+    --cream: #f7f4ef;
+    --cream-dark: #ede8e0;
+    --cream-border: #ddd8ce;
+    --ink: #1c1a17;
+    --ink-mid: #4a4540;
+    --ink-light: #8a8278;
+    --brown: #5c4a32;
+    --brown-light: #8b7355;
+    --white: #fdfcf9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: -apple-system, "Helvetica Neue", "PingFang TC", "Noto Sans TC", sans-serif;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* Slide system */
+  .slides { width: 100%; height: 100vh; position: relative; }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .slide.active { opacity: 1; pointer-events: all; }
+  .slide-inner { width: 100%; max-width: 860px; }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    z-index: 100;
+  }
+  .nav-btn {
+    width: 40px; height: 40px;
+    border: 1px solid var(--cream-border);
+    background: var(--white);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--ink-mid);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { border-color: var(--brown-light); color: var(--brown); }
+  .nav-counter { font-size: 12px; color: var(--ink-light); letter-spacing: 0.1em; }
+
+  /* Progress */
+  .progress {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--cream-border);
+    z-index: 100;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--brown-light);
+    transition: width 0.4s ease;
+  }
+
+  /* Typography */
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 16px;
+  }
+  h1 { font-size: 48px; font-weight: 300; letter-spacing: 0.04em; line-height: 1.2; color: var(--ink); }
+  h2 { font-size: 32px; font-weight: 300; letter-spacing: 0.03em; color: var(--ink); margin-bottom: 32px; }
+  h3 { font-size: 16px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brown); margin-bottom: 12px; }
+  p { font-size: 15px; line-height: 1.8; color: var(--ink-mid); }
+  .divider { width: 40px; height: 1px; background: var(--brown-light); margin: 24px 0; }
+
+  /* Cover */
+  .cover { background: var(--white); text-align: left; }
+  .cover h1 { font-size: 52px; }
+  .cover-sub { font-size: 16px; color: var(--ink-light); margin-top: 12px; letter-spacing: 0.08em; }
+  .cover-info { margin-top: 48px; font-size: 13px; color: var(--ink-light); line-height: 2; letter-spacing: 0.04em; }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+
+  /* Cards */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--cream-border);
+    border-radius: 4px;
+    padding: 24px;
+  }
+  .card-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 8px; }
+  .card-value { font-size: 28px; font-weight: 300; color: var(--ink); margin-bottom: 6px; }
+  .card-desc { font-size: 13px; color: var(--ink-light); line-height: 1.6; }
+
+  /* Flow */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .flow-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--cream-border);
+  }
+  .flow-item:last-child { border-bottom: none; }
+  .flow-num {
+    width: 28px; height: 28px;
+    border: 1px solid var(--cream-border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--brown-light);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .flow-text { font-size: 14px; color: var(--ink-mid); line-height: 1.7; }
+  .flow-text strong { color: var(--ink); font-weight: 600; }
+
+  /* Table */
+  .pitch-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .pitch-table th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--cream-border);
+    font-weight: 600;
+  }
+  .pitch-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--cream-dark);
+    color: var(--ink-mid);
+    vertical-align: middle;
+  }
+  .pitch-table tr:last-child td { border-bottom: none; }
+  .pitch-table tr.highlight td { background: var(--cream-dark); color: var(--ink); font-weight: 600; }
+  .check { color: #5a8a5a; font-size: 15px; }
+  .cross { color: #c0b8b0; font-size: 15px; }
+
+  /* Pricing */
+  .price-card {
+    background: var(--white);
+    border: 1px solid var(--cream-border);
+    border-radius: 4px;
+    padding: 28px 24px;
+  }
+  .price-card.featured { border-color: var(--brown-light); background: #faf7f2; }
+  .price-tier { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 10px; }
+  .price-amount { font-size: 32px; font-weight: 300; color: var(--ink); margin-bottom: 4px; }
+  .price-unit { font-size: 12px; color: var(--ink-light); margin-bottom: 16px; }
+  .price-items { list-style: none; }
+  .price-items li { font-size: 12px; color: var(--ink-mid); padding: 5px 0; border-bottom: 1px solid var(--cream-dark); }
+  .price-items li:last-child { border-bottom: none; }
+
+  /* Quote */
+  .quote {
+    border-left: 2px solid var(--brown-light);
+    padding: 16px 24px;
+    background: var(--white);
+    margin: 12px 0;
+  }
+  .quote p { font-size: 14px; color: var(--ink-mid); line-height: 1.8; font-style: italic; }
+
+  /* Tag */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border: 1px solid var(--cream-border);
+    border-radius: 100px;
+    font-size: 11px;
+    color: var(--ink-light);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  /* Timeline */
+  .timeline { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+  .timeline-item {
+    padding: 24px;
+    border-right: 1px solid var(--cream-border);
+  }
+  .timeline-item:last-child { border-right: none; }
+  .timeline-month { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--brown-light); margin-bottom: 10px; }
+  .timeline-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .timeline-desc { font-size: 13px; color: var(--ink-light); line-height: 1.7; }
+
+  /* Big stat */
+  .big-stat { text-align: center; }
+  .big-stat-num { font-size: 64px; font-weight: 200; color: var(--brown); letter-spacing: -0.02em; }
+  .big-stat-label { font-size: 13px; color: var(--ink-light); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* Pain point */
+  .pain-item { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--cream-border); }
+  .pain-item:last-child { border-bottom: none; }
+  .pain-icon { font-size: 18px; margin-top: 2px; }
+  .pain-text { font-size: 14px; color: var(--ink-mid); line-height: 1.7; }
+
+  /* OA function grid */
+  .oa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .oa-item {
+    background: var(--white);
+    border: 1px solid var(--cream-border);
+    padding: 18px 20px;
+    border-radius: 4px;
+  }
+  .oa-func { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  .oa-use { font-size: 12px; color: var(--ink-light); line-height: 1.6; }
+
+  /* Final */
+  .final { background: var(--ink); color: var(--cream); }
+  .final .label { color: #6b6560; }
+  .final h2 { color: var(--cream); }
+  .final .divider { background: var(--brown-light); }
+  .final p { color: #9a9188; }
+  .final .contact { font-size: 14px; color: #c4b89a; margin-top: 6px; letter-spacing: 0.05em; }
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+<div class="slides" id="slides">
+
+  <!-- Slide 1: Cover -->
+  <div class="slide cover active">
+    <div class="slide-inner">
+      <p class="label">提案簡報 · 2026</p>
+      <h1>短影音 ×<br>LINE 私域<br>導流系統</h1>
+      <p class="cover-sub">讓每一支影片都能變成你的客戶資產</p>
+      <div class="divider"></div>
+      <p class="cover-info">
+        謙謙影像<br>
+        jacky8495@gmail.com
+      </p>
+    </div>
+  </div>
+
+  <!-- Slide 2: 服務是什麼 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <p class="label">Service Overview</p>
+      <h2>這套服務做四件事</h2>
+      <div class="grid-4">
+        <div class="card">
+          <p class="card-label">01</p>
+          <p class="card-value" style="font-size:18px;font-weight:500;">短影音<br>製作</p>
+          <p class="card-desc">持續帶入新客流量</p>
+        </div>
+        <div class="card">
+          <p class="card-label">02</p>
+          <p class="card-value" style="font-size:18px;font-weight:500;">LINE<br>導流系統</p>
+          <p class="card-desc">流量轉換成私域好友</p>
+        </div>
+        <div class="card">
+          <p class="card-label">03</p>
+          <p class="card-value" style="font-size:18px;font-weight:500;">數據<br>報告</p>
+          <p class="card-desc">每月視覺化成效報告</p>
+        </div>
+        <div class="card">
+          <p class="card-label">04</p>
+          <p class="card-value" style="font-size:18px;font-weight:500;">私域<br>經營</p>
+          <p class="card-desc">長期留住客群，主動召回</p>
+        </div>
+      </div>
+      <div style="margin-top:32px;">
+        <p style="font-size:14px;color:var(--ink-light);">大多數服務幫你拍片，但不追蹤影片帶了多少人真正進店消費。這套系統做的，就是把這個缺口補起來。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: 客人流程 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <p class="label">Customer Journey</p>
+      <h2>客人怎麼走這個流程</h2>
+      <div class="flow">
+        <div class="flow-item">
+          <div class="flow-num">1</div>
+          <div class="flow-text"><strong>看到短影音</strong> — 在 Instagram Reels 或 Stories 上刷到</div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-num">2</div>
+          <div class="flow-text"><strong>點 Bio 連結</strong> — 一鍵開啟，LINE 自動登入授權</div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-num">3</div>
+          <div class="flow-text"><strong>加入官方 LINE</strong> — 系統跳出邀請，客人點加入</div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-num">4</div>
+          <div class="flow-text"><strong>LINE 推送確認</strong> — 「優惠已綁定！來店掃桌上 QR 即享免服務費」</div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-num">5</div>
+          <div class="flow-text"><strong>來店消費</strong> — 掃桌上固定 QR，LINE 推送當日驗證碼</div>
+        </div>
+        <div class="flow-item">
+          <div class="flow-num">6</div>
+          <div class="flow-text"><strong>出示訊息給店員</strong> — 核銷完成，結帳免服務費</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: 店員 + 防濫用 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <div class="grid-2" style="align-items:start;">
+        <div>
+          <p class="label">Staff Flow</p>
+          <h2 style="font-size:24px;margin-bottom:20px;">店員操作</h2>
+          <div class="flow">
+            <div class="flow-item">
+              <div class="flow-num">1</div>
+              <div class="flow-text">客人出示 LINE 驗證碼訊息</div>
+            </div>
+            <div class="flow-item">
+              <div class="flow-num">2</div>
+              <div class="flow-text">打開核銷頁面（手機瀏覽器）</div>
+            </div>
+            <div class="flow-item">
+              <div class="flow-num">3</div>
+              <div class="flow-text">輸入驗證碼 + 消費金額 + 桌號</div>
+            </div>
+            <div class="flow-item">
+              <div class="flow-num">4</div>
+              <div class="flow-text">送出，系統自動記錄，完成</div>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--ink-light);margin-top:16px;">學習時間約 5 分鐘，不需要任何技術背景</p>
+        </div>
+        <div>
+          <p class="label">Anti-Abuse</p>
+          <h2 style="font-size:24px;margin-bottom:20px;">防濫用機制</h2>
+          <div class="card" style="margin-bottom:12px;">
+            <p class="card-label">30 天限制</p>
+            <p class="card-desc">每個 LINE 帳號每 30 天只能使用一次，系統自動比對</p>
+          </div>
+          <div class="card" style="margin-bottom:12px;">
+            <p class="card-label">每日更換驗證碼</p>
+            <p class="card-desc">截圖無效，驗證碼每天自動重置</p>
+          </div>
+          <div class="card">
+            <p class="card-label">雙重核銷</p>
+            <p class="card-desc">客人有碼 + 店員輸入，缺一不可</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: 數據 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <p class="label">Data & Reporting</p>
+      <h2>你拿到的數據</h2>
+      <div class="grid-2" style="gap:24px;">
+        <div>
+          <table class="pitch-table">
+            <thead>
+              <tr><th>數據項目</th><th>用途</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>每月來客人次</td><td>對帳抽成依據</td></tr>
+              <tr><td>消費總金額</td><td>計算免服務費金額</td></tr>
+              <tr><td>平均客單價</td><td>評估客群品質</td></tr>
+              <tr><td>LINE OA 新增好友數</td><td>私域建立成果</td></tr>
+              <tr><td>來源追蹤（月度）</td><td>哪個時期效益最好</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div class="card" style="text-align:center;padding:32px;">
+            <p class="card-label" style="margin-bottom:16px;">每月產出視覺化報告</p>
+            <p style="font-size:13px;color:var(--ink-mid);line-height:1.8;">
+              來客趨勢 · 消費分析<br>
+              LINE OA 成長曲線<br>
+              影片來源比較<br><br>
+              <span style="color:var(--brown-light);font-size:12px;">店家一眼看懂<br>每月成效有清楚的數字依據</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: 痛點 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <p class="label">The Problem</p>
+      <h2>為什麼店家需要 LINE 私域</h2>
+      <div style="margin-bottom:28px;">
+        <div class="pain-item">
+          <div class="pain-icon">—</div>
+          <div class="pain-text">IG 觸及靠演算法，貼文可能只有 <strong>5%</strong> 的粉絲看到，你完全沒辦法控制</div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">—</div>
+          <div class="pain-text">沒辦法主動聯絡來過的客人，沒有屬於自己的客戶名單</div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">—</div>
+          <div class="pain-text">不知道哪些行銷動作真的帶人進來，無法量化投資報酬</div>
+        </div>
+      </div>
+      <div class="quote">
+        <p>IG 粉絲是 Meta 的，LINE 好友是店家的。<br>演算法改版不影響你，客人永遠在那裡。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: LINE OA 功能 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <p class="label">LINE Official Account</p>
+      <h2>有了 LINE OA 可以做什麼</h2>
+      <div class="oa-grid">
+        <div class="oa-item">
+          <p class="oa-func">群發訊息</p>
+          <p class="oa-use">新酒單上線、客座調酒師活動、周年慶優惠、Call 客回訪</p>
+        </div>
+        <div class="oa-item">
+          <p class="oa-func">分眾推播</p>
+          <p class="oa-use">只推給 30 天內來過的熟客，精準召回不打擾</p>
+        </div>
+        <div class="oa-item">
+          <p class="oa-func">自動回應</p>
+          <p class="oa-use">客人問營業時間，自動回覆不漏接任何詢問</p>
+        </div>
+        <div class="oa-item">
+          <p class="oa-func">集點卡</p>
+          <p class="oa-use">來店累點，增加回訪黏性和消費頻率</p>
+        </div>
+        <div class="oa-item">
+          <p class="oa-func">優惠券</p>
+          <p class="oa-use">淡季主動發券，把人帶進店裡</p>
+        </div>
+        <div class="oa-item">
+          <p class="oa-func">圖文選單</p>
+          <p class="oa-use">酒單、地圖、訂位連結，一鍵取得</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: 競品分析 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <p class="label">Competitive Analysis</p>
+      <h2>與其他方案的差異</h2>
+      <table class="pitch-table">
+        <thead>
+          <tr>
+            <th>方案</th>
+            <th style="text-align:center;">短影音</th>
+            <th style="text-align:center;">導流系統</th>
+            <th style="text-align:center;">數據報告</th>
+            <th style="text-align:center;">私域建立</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight">
+            <td>謙謙影像（本方案）</td>
+            <td style="text-align:center;" class="check">✓</td>
+            <td style="text-align:center;" class="check">✓</td>
+            <td style="text-align:center;" class="check">✓</td>
+            <td style="text-align:center;" class="check">✓</td>
+          </tr>
+          <tr>
+            <td>一般攝影師 / 拍片</td>
+            <td style="text-align:center;" class="check">✓</td>
+            <td style="text-align:center;" class="cross">—</td>
+            <td style="text-align:center;" class="cross">—</td>
+            <td style="text-align:center;" class="cross">—</td>
+          </tr>
+          <tr>
+            <td>社群小編</td>
+            <td style="text-align:center;" style="color:var(--ink-light);">部分</td>
+            <td style="text-align:center;" class="cross">—</td>
+            <td style="text-align:center;" style="color:var(--ink-light);">基本</td>
+            <td style="text-align:center;" class="cross">—</td>
+          </tr>
+          <tr>
+            <td>LINE OA 代管公司</td>
+            <td style="text-align:center;" class="cross">—</td>
+            <td style="text-align:center;" class="cross">—</td>
+            <td style="text-align:center;" style="color:var(--ink-light);">部分</td>
+            <td style="text-align:center;" class="check">✓</td>
+          </tr>
+          <tr>
+            <td>自己管 IG</td>
+            <td style="text-align:center;" style="color:var(--ink-light);">看人</td>
+            <td style="text-align:center;" class="cross">—</td>
+            <td style="text-align:center;" class="cross">—</td>
+            <td style="text-align:center;" class="cross">—</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:var(--ink-light);margin-top:20px;">大多數服務只做其中一塊，沒有人把影片到進店的轉換數據串起來。</p>
+    </div>
+  </div>
+
+  <!-- Slide 9: 常見疑慮 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <p class="label">FAQ</p>
+      <h2>你可能在想的問題</h2>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card">
+          <p class="card-label">「我們自己有在拍了」</p>
+          <p class="card-desc" style="font-size:14px;line-height:1.8;color:var(--ink-mid);">拍片是第一步，但你知道哪支影片帶了多少人進來、消費多少嗎？我做的是從影片到進店的完整追蹤，這是另一回事。</p>
+        </div>
+        <div class="card">
+          <p class="card-label">「LINE OA 感覺很複雜」</p>
+          <p class="card-desc" style="font-size:14px;line-height:1.8;color:var(--ink-mid);">你完全不用動。我幫你把系統建好、設定完，店員五分鐘學會操作，之後照常跑就好。</p>
+        </div>
+        <div class="card">
+          <p class="card-label">「不確定效果怎麼樣」</p>
+          <p class="card-desc" style="font-size:14px;line-height:1.8;color:var(--ink-mid);">所以第一個月用數據說話。跑完我出一份完整報告，你看到真實的來客數和消費金額，再決定要不要繼續。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: 定價 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <p class="label">Pricing</p>
+      <h2>服務方案</h2>
+      <p style="font-size:13px;color:var(--ink-light);margin-bottom:6px;">一次性系統設定費 NT$8,000 / 12,000，包含 LINE OA 設定、QR 系統建置、店員教學</p>
+      <p style="font-size:12px;color:var(--ink-light);margin-bottom:20px;">· NT$8,000：帳號自備，加我進管理員後設定完成 &nbsp;／&nbsp; NT$12,000：從零開始，協助申請到全部設定完交給你</p>
+      <div class="grid-3">
+        <div class="price-card">
+          <p class="price-tier">基本方案</p>
+          <p class="price-amount">24,000</p>
+          <p class="price-unit">NT$ / 月</p>
+          <ul class="price-items">
+            <li>短影音 4 支 / 月</li>
+            <li>月度數據報告</li>
+            <li>系統維護</li>
+          </ul>
+        </div>
+        <div class="price-card featured">
+          <p class="price-tier" style="color:var(--brown);">成長方案</p>
+          <p class="price-amount">34,000</p>
+          <p class="price-unit">NT$ / 月</p>
+          <ul class="price-items">
+            <li>短影音 6 支 / 月</li>
+            <li>月度數據報告</li>
+            <li>LINE 推播內容規劃 2 次 / 月</li>
+            <li>系統維護</li>
+          </ul>
+        </div>
+        <div class="price-card">
+          <p class="price-tier">全包方案</p>
+          <p class="price-amount">45,000</p>
+          <p class="price-unit">NT$ / 月</p>
+          <ul class="price-items">
+            <li>短影音 8 支 / 月</li>
+            <li>月度數據報告</li>
+            <li>LINE 推播內容規劃 4 次 / 月</li>
+            <li>系統維護</li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--ink-light);margin-top:16px;">LINE OA 平台訊息費由店家直接向 LINE 支付，不含於月費內</p>
+      <p style="font-size:12px;color:var(--ink-light);margin-top:6px;">另提供抽成制：不收月費，抽系統記錄消費金額的 15%，適合評估期使用</p>
+    </div>
+  </div>
+
+  <!-- Slide 11: 抽成方案 -->
+  <div class="slide">
+    <div class="slide-inner">
+      <p class="label">Commission Model</p>
+      <h2>抽成方案</h2>
+      <p style="font-size:14px;color:var(--ink-light);margin-bottom:32px;">不確定效果？先用成效說話，不需要承諾月費。</p>
+      <div class="grid-2" style="gap:28px;align-items:start;">
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <p class="card-label">收費方式</p>
+            <p style="font-size:28px;font-weight:300;color:var(--ink);margin-bottom:4px;">15%</p>
+            <p style="font-size:13px;color:var(--ink-light);line-height:1.7;">系統每月記錄消費總額的 15%<br>單月上限 NT$55,000</p>
+          </div>
+          <div class="card">
+            <p class="card-label">包含服務</p>
+            <ul class="price-items" style="margin-top:8px;">
+              <li>短影音 4 支 / 月</li>
+              <li>LINE 導流系統建置</li>
+              <li>月度數據報告</li>
+              <li>系統維護</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:16px;border-color:var(--brown-light);background:#faf7f2;">
+            <p class="card-label" style="color:var(--brown);">這個方案適合</p>
+            <p style="font-size:13px;color:var(--ink-mid);line-height:1.8;margin-top:4px;">想先看到真實成效再決定是否投入月費的店家。我用內容品質擔保，帶不了人你就不用付費。</p>
+          </div>
+          <div class="card">
+            <p class="card-label">費用上限試算</p>
+            <table class="pitch-table" style="margin-top:8px;">
+              <thead><tr><th>月消費記錄</th><th>費用</th></tr></thead>
+              <tbody>
+                <tr><td>NT$100,000</td><td>NT$15,000</td></tr>
+                <tr><td>NT$200,000</td><td>NT$30,000</td></tr>
+                <tr><td>NT$367,000 以上</td><td>上限 NT$55,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--ink-light);margin-top:20px;">達到一定規模後可隨時轉換為月費方案，系統設定費依狀況洽談</p>
+    </div>
+  </div>
+
+  <!-- Slide 12: 結尾 -->
+  <div class="slide final">
+    <div class="slide-inner" style="text-align:left;">
+      <p class="label">Next Step</p>
+      <h2>準備好開始了嗎</h2>
+      <div class="divider"></div>
+      <p style="font-size:15px;color:#9a9188;line-height:1.8;margin-bottom:32px;">
+        第一步不需要承諾月費。<br>
+        讓我用一個月的時間跑出真實數據，<br>
+        你看報告再決定要不要繼續。
+      </p>
+      <p class="contact">謙謙影像</p>
+      <p class="contact">jacky8495@gmail.com</p>
+      <p class="contact">Instagram · @chien_sanyo</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button class="nav-btn" onclick="prevSlide()">←</button>
+  <span class="nav-counter" id="counter">1 / 12</span>
+  <button class="nav-btn" onclick="nextSlide()">→</button>
+</div>
+
+<script>
+  var slides = document.querySelectorAll('.slide');
+  var total  = slides.length;
+  var current = 0;
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+    document.getElementById('progressBar').style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  function nextSlide() { goTo(current + 1); }
+  function prevSlide() { goTo(current - 1); }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+    if (e.key === 'ArrowLeft') prevSlide();
+  });
+
+  // Init progress
+  document.getElementById('progressBar').style.width = (1 / total * 100) + '%';
+</script>
+
+</body>
+</html>
