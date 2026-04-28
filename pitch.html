@@ -241,6 +241,61 @@
   .final .divider { background: var(--brown-light); }
   .final p { color: #9a9188; }
   .final .contact { font-size: 14px; color: #c4b89a; margin-top: 6px; letter-spacing: 0.05em; }
+
+  /* ── Mobile ── */
+  @media (max-width: 680px) {
+    body { overflow: hidden; }
+
+    .slide {
+      padding: 44px 20px 88px;
+      justify-content: flex-start;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    h1 { font-size: 32px; }
+    h2 { font-size: 20px; margin-bottom: 16px; }
+    .cover h1 { font-size: 34px; }
+    .cover-sub { font-size: 14px; }
+    .cover-info { margin-top: 28px; }
+    p { font-size: 13px; }
+    .label { margin-bottom: 10px; }
+
+    .grid-2 { grid-template-columns: 1fr; gap: 12px; }
+    .grid-3 { grid-template-columns: 1fr; gap: 12px; }
+    .grid-4 { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .oa-grid { grid-template-columns: 1fr; gap: 10px; }
+
+    .card { padding: 14px 16px; }
+    .card-value { font-size: 20px; }
+
+    .price-card { padding: 16px; }
+    .price-amount { font-size: 26px; }
+    .price-tier { margin-bottom: 6px; }
+
+    .pitch-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .pitch-table th, .pitch-table td { padding: 9px 10px; font-size: 12px; white-space: nowrap; }
+
+    .flow-item { padding: 11px 0; gap: 12px; }
+    .flow-text { font-size: 13px; }
+
+    .oa-func { font-size: 12px; }
+    .oa-use { font-size: 11px; }
+    .oa-item { padding: 14px 16px; }
+
+    .quote { padding: 12px 16px; }
+    .quote p { font-size: 13px; }
+
+    .pain-text { font-size: 13px; }
+
+    .nav { bottom: 20px; gap: 20px; }
+    .nav-btn { width: 48px; height: 48px; font-size: 18px; }
+    .nav-counter { font-size: 13px; }
+
+    .timeline { grid-template-columns: 1fr; }
+    .timeline-item { border-right: none; border-bottom: 1px solid var(--cream-border); padding: 16px; }
+    .timeline-item:last-child { border-bottom: none; }
+  }
 </style>
 </head>
 <body>
@@ -687,6 +742,20 @@
     if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
     if (e.key === 'ArrowLeft') prevSlide();
   });
+
+  // Touch swipe
+  var txStart = 0, tyStart = 0;
+  document.addEventListener('touchstart', function(e) {
+    txStart = e.touches[0].clientX;
+    tyStart = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - txStart;
+    var dy = e.changedTouches[0].clientY - tyStart;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) {
+      if (dx < 0) nextSlide(); else prevSlide();
+    }
+  }, { passive: true });
 
   // Init progress
   document.getElementById('progressBar').style.width = (1 / total * 100) + '%';
