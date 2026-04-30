@@ -234,6 +234,90 @@
   .oa-func { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
   .oa-use { font-size: 12px; color: var(--ink-light); line-height: 1.6; }
 
+  /* Advantage grid (痛點頁) */
+  .advantage {
+    background: var(--white);
+    border: 1px solid var(--cream-border);
+    border-radius: 4px;
+    padding: 22px 20px;
+  }
+  .advantage-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--brown);
+    margin-bottom: 14px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
+  .advantage-list { list-style: none; padding: 0; }
+  .advantage-list li {
+    font-size: 13px;
+    color: var(--ink-mid);
+    line-height: 1.7;
+    padding: 5px 0 5px 14px;
+    position: relative;
+  }
+  .advantage-list li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    color: var(--brown-light);
+    font-weight: 700;
+  }
+  .door-quote {
+    border-left: 3px solid var(--brown-light);
+    padding: 14px 22px;
+    background: var(--white);
+    margin-bottom: 28px;
+    border-radius: 0 4px 4px 0;
+  }
+  .door-quote p {
+    font-size: 14px;
+    color: var(--ink-mid);
+    line-height: 1.9;
+  }
+  .door-quote strong { color: var(--ink); font-weight: 600; }
+
+  /* Reels showcase (短影音頁) */
+  .reel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .reel-tags .tag {
+    margin-bottom: 0;
+    border-color: var(--brown-light);
+    color: var(--brown);
+  }
+  .reel-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 4px 14px;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+  .reel-grid::-webkit-scrollbar { height: 6px; }
+  .reel-grid::-webkit-scrollbar-track { background: var(--cream-dark); border-radius: 3px; }
+  .reel-grid::-webkit-scrollbar-thumb { background: var(--brown-light); border-radius: 3px; }
+  .reel-frame {
+    flex: 0 0 280px;
+    height: 500px;
+    border: 1px solid var(--cream-border);
+    border-radius: 4px;
+    background: var(--white);
+    scroll-snap-align: start;
+  }
+  .reel-hint {
+    font-size: 11px;
+    color: var(--ink-light);
+    letter-spacing: 0.08em;
+    margin-top: 6px;
+  }
+
   /* FAQ */
   .faq-list { display: flex; flex-direction: column; gap: 14px; }
   .faq-item {
@@ -329,6 +413,15 @@
     .faq-a { font-size: 13px; gap: 10px; }
     .qa-mark { font-size: 12px; }
 
+    .advantage { padding: 14px 16px; }
+    .advantage-title { font-size: 13px; margin-bottom: 10px; }
+    .advantage-list li { font-size: 12px; padding: 4px 0 4px 12px; }
+    .door-quote { padding: 12px 16px; margin-bottom: 18px; }
+    .door-quote p { font-size: 13px; line-height: 1.85; }
+
+    .reel-frame { flex: 0 0 240px; height: 430px; }
+    .reel-tags { margin-bottom: 16px; }
+
     .nav { bottom: 20px; gap: 20px; }
     .nav-btn { width: 48px; height: 48px; font-size: 18px; }
     .nav-counter { font-size: 13px; }
@@ -392,7 +485,33 @@
     </div>
   </div>
 
-  <!-- Slide 3: 客人流程 -->
+  <!-- Slide 3: 短影音不流於形式 -->
+  <div class="slide">
+    <div class="slide-inner" style="max-width: 1100px;">
+      <p class="label">Content Quality</p>
+      <h2>我們拍的短影音不流於形式</h2>
+      <p style="font-size:14px;color:var(--ink-mid);line-height:1.85;margin-bottom:18px;">
+        規劃並了解品牌價值後，依據美感製作出真正能打動人的內容。每一支影片都不是套版產出，是針對你的品牌量身設計。
+      </p>
+      <div class="reel-tags">
+        <span class="tag">故事感</span>
+        <span class="tag">有溫度</span>
+        <span class="tag">有創意</span>
+        <span class="tag">有 sense</span>
+        <span class="tag">病毒式擴散</span>
+      </div>
+      <div class="reel-grid">
+        <iframe class="reel-frame" loading="lazy" src="https://www.instagram.com/reel/DN2s84a5J2A/embed" frameborder="0" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe>
+        <iframe class="reel-frame" loading="lazy" src="https://www.instagram.com/reel/DN5Pbe0kn5s/embed" frameborder="0" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe>
+        <iframe class="reel-frame" loading="lazy" src="https://www.instagram.com/reel/DJ6jQlFJ5rD/embed" frameborder="0" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe>
+        <iframe class="reel-frame" loading="lazy" src="https://www.instagram.com/reel/DP56GULEus6/embed" frameborder="0" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe>
+        <iframe class="reel-frame" loading="lazy" src="https://www.instagram.com/reel/DVihWurkfUW/embed" frameborder="0" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe>
+      </div>
+      <p class="reel-hint">← 左右滑動查看更多作品 →</p>
+    </div>
+  </div>
+
+  <!-- Slide 4: 客人流程 -->
   <div class="slide">
     <div class="slide-inner">
       <p class="label">Customer Journey</p>
@@ -508,27 +627,42 @@
     </div>
   </div>
 
-  <!-- Slide 6: 痛點 -->
+  <!-- Slide 7: 痛點 -->
   <div class="slide">
     <div class="slide-inner">
       <p class="label">The Problem</p>
       <h2>為什麼店家需要 LINE 私域</h2>
-      <div style="margin-bottom:28px;">
-        <div class="pain-item">
-          <div class="pain-icon">—</div>
-          <div class="pain-text">IG 觸及靠演算法，貼文可能只有 <strong>5%</strong> 的粉絲看到，你完全沒辦法控制</div>
-        </div>
-        <div class="pain-item">
-          <div class="pain-icon">—</div>
-          <div class="pain-text">沒辦法主動聯絡來過的客人，沒有屬於自己的客戶名單</div>
-        </div>
-        <div class="pain-item">
-          <div class="pain-icon">—</div>
-          <div class="pain-text">不知道哪些行銷動作真的帶人進來，無法量化投資報酬</div>
-        </div>
+      <div class="door-quote">
+        <p>
+          IG 的頁面就像是路上的店家——走路經過，店面裝潢好看可以引起注意力，但只要客人沒有開門走進店裡，你幾乎沒辦法介紹自己的產品。<br><br>
+          <strong>導流到官方 LINE，就是在做「打開門」這件事。</strong>
+        </p>
       </div>
-      <div class="quote">
-        <p>IG 粉絲是 Meta 的，LINE 好友是店家的。<br>演算法改版不影響你，客人永遠在那裡。</p>
+      <div class="grid-3" style="gap:18px;">
+        <div class="advantage">
+          <p class="advantage-title">觸及率掌握在自己手上</p>
+          <ul class="advantage-list">
+            <li>IG 演算法只給 <strong>5%</strong> 粉絲看到貼文</li>
+            <li>LINE 推播能 100% 直達熟客</li>
+            <li>演算法改版完全不影響你</li>
+          </ul>
+        </div>
+        <div class="advantage">
+          <p class="advantage-title">建立屬於你的客戶名單</p>
+          <ul class="advantage-list">
+            <li>來過的客人從此能主動聯絡</li>
+            <li>IG 粉絲是 Meta 的，LINE 好友是你的</li>
+            <li>不會因為平台政策一夕歸零</li>
+          </ul>
+        </div>
+        <div class="advantage">
+          <p class="advantage-title">行銷投資可以量化</p>
+          <ul class="advantage-list">
+            <li>每支影片帶來幾位新客一目了然</li>
+            <li>用實際消費金額驗證內容成效</li>
+            <li>找出哪個方向最有 ROI</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -716,7 +850,7 @@
 <!-- Navigation -->
 <div class="nav">
   <button class="nav-btn" onclick="prevSlide()">←</button>
-  <span class="nav-counter" id="counter">1 / 11</span>
+  <span class="nav-counter" id="counter">1 / 12</span>
   <button class="nav-btn" onclick="nextSlide()">→</button>
 </div>
 
