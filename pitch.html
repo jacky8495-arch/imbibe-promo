@@ -43,7 +43,17 @@
     transition: opacity 0.4s ease;
   }
   .slide.active { opacity: 1; pointer-events: all; }
+  .slide.reel-slide {
+    justify-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   .slide-inner { width: 100%; max-width: 860px; }
+
+  /* Center the label and main heading on inner slides */
+  .slide .label, .slide h2 { text-align: center; }
+  .slide.cover .label, .slide.cover h1 { text-align: left; }
+  .slide.final .label, .slide.final h2 { text-align: left; }
 
   /* Navigation */
   .nav {
@@ -235,43 +245,82 @@
   .oa-func { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
   .oa-use { font-size: 12px; color: var(--ink-light); line-height: 1.6; }
 
-  /* Compare cards (mobile only) */
-  .compare-cards { display: none; }
-  .compare-card {
-    background: var(--white);
+  /* Compare chart (dot matrix) */
+  .compare-chart {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr));
     border: 1px solid var(--cream-border);
     border-radius: 4px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
+    overflow: hidden;
+    background: var(--white);
   }
-  .compare-card.highlight {
-    background: var(--cream-dark);
-    border-color: var(--brown-light);
-  }
-  .compare-card.highlight .compare-name { color: var(--ink); font-weight: 700; }
-  .compare-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink);
-    margin-bottom: 8px;
-  }
-  .compare-list {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px 12px;
-  }
-  .compare-list li {
-    font-size: 12px;
-    color: var(--ink-mid);
+  .cc-cell {
+    padding: 14px 10px;
     display: flex;
-    justify-content: space-between;
-    padding: 2px 0;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--ink-mid);
+    border-bottom: 1px solid var(--cream-dark);
+    line-height: 1.4;
   }
-  .compare-list .check { color: #5a8a5a; font-weight: 600; }
-  .compare-list .cross { color: #c0b8b0; }
-  .compare-list .partial { color: var(--ink-light); font-size: 11px; }
+  .cc-cell.cc-name {
+    justify-content: flex-start;
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    padding-left: 16px;
+    text-align: left;
+  }
+  .cc-cell.cc-h {
+    background: var(--cream-dark);
+    font-size: 11px;
+    color: var(--ink-light);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .cc-cell.cc-highlight {
+    background: #faf7f2;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .cc-cell.cc-name.cc-highlight { font-weight: 700; }
+  .compare-chart > .cc-cell:nth-last-child(-n+5) { border-bottom: none; }
+
+  .dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot.full { background: var(--brown-light); }
+  .dot.partial {
+    background: linear-gradient(135deg, var(--brown-light) 50%, transparent 50%);
+    border: 1.5px solid var(--brown-light);
+    box-sizing: border-box;
+  }
+  .dot.empty {
+    background: transparent;
+    border: 1.5px solid var(--cream-border);
+    box-sizing: border-box;
+  }
+
+  .cc-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 22px;
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+  .cc-legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
 
   /* Advantage grid (痛點頁) */
   .advantage {
@@ -438,8 +487,13 @@
 
     .pitch-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .pitch-table th, .pitch-table td { padding: 9px 10px; font-size: 12px; white-space: nowrap; }
-    .pitch-table.compare-table { display: none; }
-    .compare-cards { display: block; }
+
+    .compare-chart { grid-template-columns: minmax(0, 1.5fr) repeat(4, minmax(0, 1fr)); }
+    .cc-cell { padding: 10px 4px; font-size: 11px; }
+    .cc-cell.cc-name { font-size: 11px; padding-left: 10px; padding-right: 4px; line-height: 1.3; }
+    .cc-cell.cc-h { font-size: 9px; padding: 8px 2px; letter-spacing: 0.05em; }
+    .dot { width: 11px; height: 11px; }
+    .cc-legend { gap: 14px; font-size: 11px; }
 
     .flow-item { padding: 11px 0; gap: 12px; }
     .flow-text { font-size: 13px; }
@@ -536,7 +590,7 @@
   </div>
 
   <!-- Slide 3: 短影音不流於形式 -->
-  <div class="slide">
+  <div class="slide reel-slide">
     <div class="slide-inner" style="max-width: 1100px;">
       <p class="label">Content Quality</p>
       <h2>我們拍的短影音不流於形式</h2>
@@ -750,103 +804,51 @@
     <div class="slide-inner">
       <p class="label">Competitive Analysis</p>
       <h2>與其他方案的差異</h2>
-      <table class="pitch-table compare-table">
-        <thead>
-          <tr>
-            <th>方案</th>
-            <th style="text-align:center;">短影音</th>
-            <th style="text-align:center;">導流系統</th>
-            <th style="text-align:center;">數據報告</th>
-            <th style="text-align:center;">私域建立</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="highlight">
-            <td>謙謙影像（本方案）</td>
-            <td style="text-align:center;" class="check">✓</td>
-            <td style="text-align:center;" class="check">✓</td>
-            <td style="text-align:center;" class="check">✓</td>
-            <td style="text-align:center;" class="check">✓</td>
-          </tr>
-          <tr>
-            <td>一般攝影師 / 拍片</td>
-            <td style="text-align:center;" class="check">✓</td>
-            <td style="text-align:center;" class="cross">—</td>
-            <td style="text-align:center;" class="cross">—</td>
-            <td style="text-align:center;" class="cross">—</td>
-          </tr>
-          <tr>
-            <td>社群小編</td>
-            <td style="text-align:center;" style="color:var(--ink-light);">部分</td>
-            <td style="text-align:center;" class="cross">—</td>
-            <td style="text-align:center;" style="color:var(--ink-light);">基本</td>
-            <td style="text-align:center;" class="cross">—</td>
-          </tr>
-          <tr>
-            <td>LINE OA 代管公司</td>
-            <td style="text-align:center;" class="cross">—</td>
-            <td style="text-align:center;" class="cross">—</td>
-            <td style="text-align:center;" style="color:var(--ink-light);">部分</td>
-            <td style="text-align:center;" class="check">✓</td>
-          </tr>
-          <tr>
-            <td>自己管 IG</td>
-            <td style="text-align:center;" style="color:var(--ink-light);">看人</td>
-            <td style="text-align:center;" class="cross">—</td>
-            <td style="text-align:center;" class="cross">—</td>
-            <td style="text-align:center;" class="cross">—</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="compare-chart">
+        <div class="cc-cell cc-h cc-name"></div>
+        <div class="cc-cell cc-h">短影音</div>
+        <div class="cc-cell cc-h">導流系統</div>
+        <div class="cc-cell cc-h">數據報告</div>
+        <div class="cc-cell cc-h">私域建立</div>
 
-      <div class="compare-cards">
-        <div class="compare-card highlight">
-          <p class="compare-name">謙謙影像（本方案）</p>
-          <ul class="compare-list">
-            <li><span>短影音</span><span class="check">✓</span></li>
-            <li><span>導流系統</span><span class="check">✓</span></li>
-            <li><span>數據報告</span><span class="check">✓</span></li>
-            <li><span>私域建立</span><span class="check">✓</span></li>
-          </ul>
-        </div>
-        <div class="compare-card">
-          <p class="compare-name">一般攝影師 / 拍片</p>
-          <ul class="compare-list">
-            <li><span>短影音</span><span class="check">✓</span></li>
-            <li><span>導流系統</span><span class="cross">—</span></li>
-            <li><span>數據報告</span><span class="cross">—</span></li>
-            <li><span>私域建立</span><span class="cross">—</span></li>
-          </ul>
-        </div>
-        <div class="compare-card">
-          <p class="compare-name">社群小編</p>
-          <ul class="compare-list">
-            <li><span>短影音</span><span class="partial">部分</span></li>
-            <li><span>導流系統</span><span class="cross">—</span></li>
-            <li><span>數據報告</span><span class="partial">基本</span></li>
-            <li><span>私域建立</span><span class="cross">—</span></li>
-          </ul>
-        </div>
-        <div class="compare-card">
-          <p class="compare-name">LINE OA 代管公司</p>
-          <ul class="compare-list">
-            <li><span>短影音</span><span class="cross">—</span></li>
-            <li><span>導流系統</span><span class="cross">—</span></li>
-            <li><span>數據報告</span><span class="partial">部分</span></li>
-            <li><span>私域建立</span><span class="check">✓</span></li>
-          </ul>
-        </div>
-        <div class="compare-card">
-          <p class="compare-name">自己管 IG</p>
-          <ul class="compare-list">
-            <li><span>短影音</span><span class="partial">看人</span></li>
-            <li><span>導流系統</span><span class="cross">—</span></li>
-            <li><span>數據報告</span><span class="cross">—</span></li>
-            <li><span>私域建立</span><span class="cross">—</span></li>
-          </ul>
-        </div>
+        <div class="cc-cell cc-name cc-highlight">謙謙影像（本方案）</div>
+        <div class="cc-cell cc-highlight"><span class="dot full"></span></div>
+        <div class="cc-cell cc-highlight"><span class="dot full"></span></div>
+        <div class="cc-cell cc-highlight"><span class="dot full"></span></div>
+        <div class="cc-cell cc-highlight"><span class="dot full"></span></div>
+
+        <div class="cc-cell cc-name">一般攝影師 / 拍片</div>
+        <div class="cc-cell"><span class="dot full"></span></div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
+
+        <div class="cc-cell cc-name">社群小編</div>
+        <div class="cc-cell"><span class="dot partial"></span></div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
+        <div class="cc-cell"><span class="dot partial"></span></div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
+
+        <div class="cc-cell cc-name">LINE OA 代管公司</div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
+        <div class="cc-cell"><span class="dot partial"></span></div>
+        <div class="cc-cell"><span class="dot full"></span></div>
+
+        <div class="cc-cell cc-name">自己管 IG</div>
+        <div class="cc-cell"><span class="dot partial"></span></div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
+        <div class="cc-cell"><span class="dot empty"></span></div>
       </div>
-      <p style="font-size:12px;color:var(--ink-light);margin-top:20px;">大多數服務只做其中一塊，沒有人把影片到進店的轉換數據串起來。</p>
+
+      <div class="cc-legend">
+        <span><span class="dot full"></span>完整提供</span>
+        <span><span class="dot partial"></span>部分提供</span>
+        <span><span class="dot empty"></span>未提供</span>
+      </div>
+
+      <p style="font-size:12px;color:var(--ink-light);margin-top:18px;text-align:center;">大多數服務只做其中一塊，沒有人把影片到進店的轉換數據串起來。</p>
     </div>
   </div>
 
