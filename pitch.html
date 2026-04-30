@@ -234,6 +234,42 @@
   .oa-func { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
   .oa-use { font-size: 12px; color: var(--ink-light); line-height: 1.6; }
 
+  /* FAQ */
+  .faq-list { display: flex; flex-direction: column; gap: 14px; }
+  .faq-item {
+    background: var(--white);
+    border: 1px solid var(--cream-border);
+    border-radius: 4px;
+    padding: 20px 24px;
+  }
+  .faq-q {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 12px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+  .faq-a {
+    font-size: 14px;
+    color: var(--ink-mid);
+    line-height: 1.85;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .qa-mark {
+    color: var(--brown);
+    font-weight: 600;
+    font-size: 13px;
+    flex-shrink: 0;
+    padding-top: 2px;
+    letter-spacing: 0.08em;
+    min-width: 14px;
+  }
+
   /* Final */
   .final { background: var(--ink); color: var(--cream); }
   .final .label { color: #6b6560; }
@@ -287,6 +323,11 @@
     .quote p { font-size: 13px; }
 
     .pain-text { font-size: 13px; }
+
+    .faq-item { padding: 14px 16px; }
+    .faq-q { font-size: 14px; gap: 10px; margin-bottom: 8px; }
+    .faq-a { font-size: 13px; gap: 10px; }
+    .qa-mark { font-size: 12px; }
 
     .nav { bottom: 20px; gap: 20px; }
     .nav-btn { width: 48px; height: 48px; font-size: 18px; }
@@ -588,18 +629,18 @@
     <div class="slide-inner">
       <p class="label">FAQ</p>
       <h2>你可能在想的問題</h2>
-      <div style="display:flex;flex-direction:column;gap:16px;">
-        <div class="card">
-          <p class="card-label">「我們自己有在拍了」</p>
-          <p class="card-desc" style="font-size:14px;line-height:1.8;color:var(--ink-mid);">拍片是第一步，但你知道哪支影片帶了多少人進來、消費多少嗎？我做的是從影片到進店的完整追蹤，這是另一回事。</p>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q"><span class="qa-mark">Q.</span>我們自己有在拍了</div>
+          <div class="faq-a"><span class="qa-mark">A.</span>拍片是第一步，但你知道哪支影片帶了多少人進來、消費多少嗎？我做的是從影片到進店的完整追蹤，這是另一回事。</div>
         </div>
-        <div class="card">
-          <p class="card-label">「LINE OA 感覺很複雜」</p>
-          <p class="card-desc" style="font-size:14px;line-height:1.8;color:var(--ink-mid);">你完全不用動。我幫你把系統建好、設定完，店員五分鐘學會操作，之後照常跑就好。</p>
+        <div class="faq-item">
+          <div class="faq-q"><span class="qa-mark">Q.</span>LINE OA 感覺很複雜</div>
+          <div class="faq-a"><span class="qa-mark">A.</span>你完全不用動。我幫你把系統建好、設定完，店員五分鐘學會操作，之後照常跑就好。</div>
         </div>
-        <div class="card">
-          <p class="card-label">「不確定效果怎麼樣」</p>
-          <p class="card-desc" style="font-size:14px;line-height:1.8;color:var(--ink-mid);">所以第一個月用數據說話。跑完我出一份完整報告，你看到真實的來客數和消費金額，再決定要不要繼續。</p>
+        <div class="faq-item">
+          <div class="faq-q"><span class="qa-mark">Q.</span>不確定效果怎麼樣</div>
+          <div class="faq-a"><span class="qa-mark">A.</span>所以第一個月用數據說話。跑完我出一份完整報告，你看到真實的來客數和消費金額，再決定要不要繼續。</div>
         </div>
       </div>
     </div>
@@ -661,8 +702,8 @@
       <div class="divider"></div>
       <p style="font-size:15px;color:#9a9188;line-height:1.8;margin-bottom:32px;">
         影片帶來一波客人，私域留下一輩子的關係。<br>
-        從這個月開始，讓每一支影片都成為你長期經營的客戶資產。<br>
-        我們先約 30 分鐘聊聊，幫你規劃最適合的起點。
+        從建立品牌、視覺美感到品牌規劃，<br>
+        讓每一支影片都成為你長期經營的客戶資產。
       </p>
       <p class="contact">謙謙影像</p>
       <p class="contact">jacky8495@gmail.com</p>
