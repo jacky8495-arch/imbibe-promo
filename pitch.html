@@ -25,6 +25,7 @@
     font-family: -apple-system, "Helvetica Neue", "PingFang TC", "Noto Sans TC", sans-serif;
     overflow: hidden;
     height: 100vh;
+    touch-action: manipulation;
   }
 
   /* Slide system */
@@ -234,6 +235,44 @@
   .oa-func { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
   .oa-use { font-size: 12px; color: var(--ink-light); line-height: 1.6; }
 
+  /* Compare cards (mobile only) */
+  .compare-cards { display: none; }
+  .compare-card {
+    background: var(--white);
+    border: 1px solid var(--cream-border);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .compare-card.highlight {
+    background: var(--cream-dark);
+    border-color: var(--brown-light);
+  }
+  .compare-card.highlight .compare-name { color: var(--ink); font-weight: 700; }
+  .compare-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .compare-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+  }
+  .compare-list li {
+    font-size: 12px;
+    color: var(--ink-mid);
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+  .compare-list .check { color: #5a8a5a; font-weight: 600; }
+  .compare-list .cross { color: #c0b8b0; }
+  .compare-list .partial { color: var(--ink-light); font-size: 11px; }
+
   /* Advantage grid (痛點頁) */
   .advantage {
     background: var(--white);
@@ -292,30 +331,25 @@
     color: var(--brown);
   }
   .reel-grid {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 16px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 4px 4px 14px;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
+    padding: 4px 0 14px;
   }
-  .reel-grid::-webkit-scrollbar { height: 6px; }
-  .reel-grid::-webkit-scrollbar-track { background: var(--cream-dark); border-radius: 3px; }
-  .reel-grid::-webkit-scrollbar-thumb { background: var(--brown-light); border-radius: 3px; }
   .reel-frame {
-    flex: 0 0 280px;
-    height: 500px;
+    width: 100%;
+    height: 540px;
     border: 1px solid var(--cream-border);
     border-radius: 4px;
     background: var(--white);
-    scroll-snap-align: start;
+    display: block;
   }
   .reel-hint {
     font-size: 11px;
     color: var(--ink-light);
     letter-spacing: 0.08em;
     margin-top: 6px;
+    text-align: center;
   }
 
   /* FAQ */
@@ -361,6 +395,15 @@
   .final .divider { background: var(--brown-light); }
   .final p { color: #9a9188; }
   .final .contact { font-size: 14px; color: #c4b89a; margin-top: 6px; letter-spacing: 0.05em; }
+  .final-analogy {
+    margin-bottom: 26px;
+    padding: 18px 22px;
+    border-left: 2px solid var(--brown-light);
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0 4px 4px 0;
+  }
+  .final-analogy p { font-size: 14px; color: #b3a99c; line-height: 1.9; margin-bottom: 10px; }
+  .final-analogy p.highlight { color: #e8dcc4; font-size: 16px; font-weight: 500; margin-bottom: 0; margin-top: 12px; }
 
   /* ── Mobile ── */
   @media (max-width: 680px) {
@@ -395,6 +438,8 @@
 
     .pitch-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .pitch-table th, .pitch-table td { padding: 9px 10px; font-size: 12px; white-space: nowrap; }
+    .pitch-table.compare-table { display: none; }
+    .compare-cards { display: block; }
 
     .flow-item { padding: 11px 0; gap: 12px; }
     .flow-text { font-size: 13px; }
@@ -419,8 +464,13 @@
     .door-quote { padding: 12px 16px; margin-bottom: 18px; }
     .door-quote p { font-size: 13px; line-height: 1.85; }
 
-    .reel-frame { flex: 0 0 240px; height: 430px; }
+    .reel-grid { grid-template-columns: 1fr; gap: 12px; }
+    .reel-frame { height: 520px; max-width: 100%; }
     .reel-tags { margin-bottom: 16px; }
+
+    .final-analogy { padding: 14px 16px; margin-bottom: 18px; }
+    .final-analogy p { font-size: 13px; line-height: 1.85; }
+    .final-analogy p.highlight { font-size: 14px; }
 
     .nav { bottom: 20px; gap: 20px; }
     .nav-btn { width: 48px; height: 48px; font-size: 18px; }
@@ -507,7 +557,7 @@
         <iframe class="reel-frame" loading="lazy" src="https://www.instagram.com/reel/DP56GULEus6/embed" frameborder="0" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe>
         <iframe class="reel-frame" loading="lazy" src="https://www.instagram.com/reel/DVihWurkfUW/embed" frameborder="0" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe>
       </div>
-      <p class="reel-hint">← 左右滑動查看更多作品 →</p>
+      <p class="reel-hint">點擊任一作品可在 Instagram 上觀看完整影片</p>
     </div>
   </div>
 
@@ -632,12 +682,6 @@
     <div class="slide-inner">
       <p class="label">The Problem</p>
       <h2>為什麼店家需要 LINE 私域</h2>
-      <div class="door-quote">
-        <p>
-          IG 的頁面就像是路上的店家——走路經過，店面裝潢好看可以引起注意力，但只要客人沒有開門走進店裡，你幾乎沒辦法介紹自己的產品。<br><br>
-          <strong>導流到官方 LINE，就是在做「打開門」這件事。</strong>
-        </p>
-      </div>
       <div class="grid-3" style="gap:18px;">
         <div class="advantage">
           <p class="advantage-title">觸及率掌握在自己手上</p>
@@ -706,7 +750,7 @@
     <div class="slide-inner">
       <p class="label">Competitive Analysis</p>
       <h2>與其他方案的差異</h2>
-      <table class="pitch-table">
+      <table class="pitch-table compare-table">
         <thead>
           <tr>
             <th>方案</th>
@@ -754,6 +798,54 @@
           </tr>
         </tbody>
       </table>
+
+      <div class="compare-cards">
+        <div class="compare-card highlight">
+          <p class="compare-name">謙謙影像（本方案）</p>
+          <ul class="compare-list">
+            <li><span>短影音</span><span class="check">✓</span></li>
+            <li><span>導流系統</span><span class="check">✓</span></li>
+            <li><span>數據報告</span><span class="check">✓</span></li>
+            <li><span>私域建立</span><span class="check">✓</span></li>
+          </ul>
+        </div>
+        <div class="compare-card">
+          <p class="compare-name">一般攝影師 / 拍片</p>
+          <ul class="compare-list">
+            <li><span>短影音</span><span class="check">✓</span></li>
+            <li><span>導流系統</span><span class="cross">—</span></li>
+            <li><span>數據報告</span><span class="cross">—</span></li>
+            <li><span>私域建立</span><span class="cross">—</span></li>
+          </ul>
+        </div>
+        <div class="compare-card">
+          <p class="compare-name">社群小編</p>
+          <ul class="compare-list">
+            <li><span>短影音</span><span class="partial">部分</span></li>
+            <li><span>導流系統</span><span class="cross">—</span></li>
+            <li><span>數據報告</span><span class="partial">基本</span></li>
+            <li><span>私域建立</span><span class="cross">—</span></li>
+          </ul>
+        </div>
+        <div class="compare-card">
+          <p class="compare-name">LINE OA 代管公司</p>
+          <ul class="compare-list">
+            <li><span>短影音</span><span class="cross">—</span></li>
+            <li><span>導流系統</span><span class="cross">—</span></li>
+            <li><span>數據報告</span><span class="partial">部分</span></li>
+            <li><span>私域建立</span><span class="check">✓</span></li>
+          </ul>
+        </div>
+        <div class="compare-card">
+          <p class="compare-name">自己管 IG</p>
+          <ul class="compare-list">
+            <li><span>短影音</span><span class="partial">看人</span></li>
+            <li><span>導流系統</span><span class="cross">—</span></li>
+            <li><span>數據報告</span><span class="cross">—</span></li>
+            <li><span>私域建立</span><span class="cross">—</span></li>
+          </ul>
+        </div>
+      </div>
       <p style="font-size:12px;color:var(--ink-light);margin-top:20px;">大多數服務只做其中一塊，沒有人把影片到進店的轉換數據串起來。</p>
     </div>
   </div>
@@ -834,6 +926,10 @@
       <p class="label">Next Step</p>
       <h2>準備好開始了嗎</h2>
       <div class="divider"></div>
+      <div class="final-analogy">
+        <p>社群平台的頁面就像是路上的店家——走路經過，店面裝潢好看可以引起注意力，但只要客人沒有開門走進店裡，你幾乎沒辦法介紹自己的產品。</p>
+        <p class="highlight">而我們，就是在做「打開門」這件事情。</p>
+      </div>
       <p style="font-size:15px;color:#9a9188;line-height:1.8;margin-bottom:32px;">
         影片帶來一波客人，私域留下一輩子的關係。<br>
         從建立品牌、視覺美感到品牌規劃，<br>
