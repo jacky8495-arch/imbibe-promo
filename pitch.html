@@ -460,9 +460,15 @@
 
     .slide {
       padding: 44px 20px 88px;
-      justify-content: flex-start;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+    }
+    .slide > .slide-inner {
+      margin: auto 0;
+      flex-shrink: 0;
+    }
+    .slide.reel-slide > .slide-inner {
+      margin: 0;
     }
 
     h1 { font-size: 32px; }
